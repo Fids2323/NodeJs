@@ -19,13 +19,11 @@ async function addNote(title){
 }
 
 
-async function removeNote(NodeId){
+async function removeNote(id){
     const notes = await getNotes()
-    let notesNew = notes.filter(note=>{
-      return +note.id !== NodeId.id
-    })
+    const filtered = notes.filter((note) => note.id !== id);
 
-    await  fs.writeFile(notesPath, JSON.stringify(notesNew))
+    await  fs.writeFile(notesPath, JSON.stringify(filtered))
     console.log(chalk.bgGreen('Node was deleted!'))
 }
 
@@ -34,6 +32,20 @@ async function getNotes(){
     const notes = await fs.readFile(notesPath, {encoding: 'utf-8'})
     return Array.isArray(JSON.parse(notes)) ? JSON.parse(notes) : []
 }
+
+async function editNote(id,title) {
+    const notes = await getNotes()
+    const editNotes = notes.map((note)=>{
+        if(note.id === id){
+            note.title =title
+        }
+        return note
+    })
+    await  fs.writeFile(notesPath, JSON.stringify(editNotes))
+    console.log(chalk.bgGreen('Node was edited!'))
+}
+
+
 
 async function printNotes(){
     const  notes = await getNotes()
@@ -45,6 +57,7 @@ async function printNotes(){
 
 module.exports = {
     addNote,
-    printNotes,
-    removeNote
+    getNotes,
+    removeNote,
+    editNote
 }
